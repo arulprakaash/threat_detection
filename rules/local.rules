@@ -1,0 +1,77 @@
+# $Id: local.rules,v 1.11 2004/07/23 20:15:44 bmc Exp $
+# ----------------
+# LOCAL RULES
+# ----------------
+# This file intentionally does not come with signatures.  Put your local
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any ( msg:" syn-fin packet detected";flags:SF;  sid:1000001; rev:10;)
+
+#alert tcp $EXTERNAL_NET any -> $HOME_NET any ( msg:"possible exploit"; content:"|90|";sid:1000002;rev:11;)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ddos"; flags:S; threshold:type threshold,track by_dst,count 13, seconds 60;sid:1000003;rev:12; )
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"backdoor"; dsize:<60;threshold:type both,track by_dst,count 20, seconds 10;sid:1000004;rev:13;)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ddos from same src"; flags:S; threshold:type threshold,track by_src,count 13, seconds 60;sid:1000005;rev:14; )
+
+
+
+alert udp any 53 -> $HOME_NET any (msg:"dns request for blocked content";sid:1000007;rev:16;content:"|43 D7 41 82|";)
+
+#malware
+
+
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET 201 (msg:"Gh0stRAT malware v3.6 June 2015 check-in "; flow:to_server,established;content:"|63 6c 61 72 6b 63 6c 61 72 31|"; depth:10; sid:1000009; rev:18;)
+
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"ET TROJAN W32/Boaxxe.Downloader CnC Beacon"; flow:established,to_server; content:"|7C|CM01|7C|CM02|7C|CM03|7C|CM03.";depth:40;classtype:trojan-activity;reference:md5,fd2598e843d7c4d3d45f3038c06d8715; reference:http://myonlinesecurity.co.uk/notice-of-appearance-in-court-js-malware/; sid:1000010; rev:19;)
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+#Submitted 14-April-2014 to EmergingSigs
+
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:"ET TROJAN SeaDuke User-Agent";flow:established,to_server; content:"GET";http_method; content:"User-Agent|3A| SiteBar/3.3.8 (Bookmark Server|3B| http|3A|//sitebar.org/|0D 0A|)";http_header; reference:md5,a25ec7749b2de12c2a86167afa88a4dd;reference:url,researchcenter.paloaltonetworks.com/2015/07/unit-42-technical-analysis-seaduke/;classtype:trojan-activity; sid:1000013; rev:22;)
+
+
+
+#Submitted on 10-Aug-2015
+#Rule to detect the new Download pattern seen in Dridex malware
+
+
+
+alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:"DiamondFox GET Plugin request "; flow:to_server,established;content:"|2f 77 65 62 73 69 74 6f 2f 70 6c 75 67 69 6e 73 2f|"; within:50; sid:1000015; rev:24;)
+
+# Zeus MiTM detection rule ssl attack 
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET TROJAN ABUSE.CH SSL Blacklist Malicious SSL certificate detected (VMZeuS MITM)";flow:established,from_server; content:"|55 04 03|"; content:"|13|contactcitywell.com"; distance:1; within:20; fast_pattern;reference:url,sslbl.abuse.ch; classtype:trojan-activity; sid:1000016; rev:25;)
+
+# sql injection
+
+alert tcp any any -> any 80 (msg: “Error Based SQL Injection”; content: "%E2%80%99" ; sid:100000017; )
+
+alert tcp any any -> any 80 (msg: “Error Based SQL Injection”; content: "%22" ; sid:100000018; )
+
+alert tcp any any -> any 80 (msg: “AND SQL Injection”; content: "%26%26" ; nocase; sid:1000019; )
+
+alert tcp any any -> any 80 (msg: “OR SQL Injection”; content: "%7c%7c" ; nocase; sid:1000020; )
+
+alert tcp any any -> any 80 (msg: “Form Based SQL Injection”; content: "%27" ; sid:1000021; ) 
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"NIISQL Injection - Paranoid"; flow:to_server,established;uricontent:".pl";pcre:"/(\%27)|(\')|(\-\-)|(%23)|(#)/i"; classtype:web-application-attack; sid:1000022; rev:31;)
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"NIICross-site scripting attempt"; flow:to_server,established; pcre:"/((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/i"; classtype:web-application-attack;sid:1000023; rev:32;)
+
+
+

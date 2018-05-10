@@ -1,0 +1,2 @@
+sudo snort -k none -A fast -c /etc/snort/snort.conf -r maccdc2012_00000.pcap_2
+

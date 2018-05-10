@@ -1,0 +1,13 @@
+# sql injection
+
+alert tcp any any -> any 80 (msg: “Error Based SQL Injection”; content: "%E2%80%99" ; sid:100000017; )
+
+alert tcp any any -> any 80 (msg: “Error Based SQL Injection”; content: "%22" ; sid:100000018; )
+
+alert tcp any any -> any 80 (msg: “AND SQL Injection”; content: "%26%26" ; nocase; sid:1000019; )
+
+alert tcp any any -> any 80 (msg: “OR SQL Injection”; content: "%7c%7c" ; nocase; sid:1000020; )
+
+alert tcp any any -> any 80 (msg: “Form Based SQL Injection”; content: "%27" ; sid:1000021; ) 
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"NIISQL Injection - Paranoid"; flow:to_server,established;uricontent:".pl";pcre:"/(\%27)|(\')|(\-\-)|(%23)|(#)/i"; classtype:web-application-attack; sid:1000022; rev:31;)

@@ -1,0 +1,5 @@
+# Zeus MiTM detection rule ssl attack 
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET TROJAN ABUSE.CH SSL Blacklist Malicious SSL certificate detected (VMZeuS MITM)";flow:established,from_server; content:"|55 04 03|"; content:"|13|contactcitywell.com"; distance:1; within:20; fast_pattern;reference:url,sslbl.abuse.ch; classtype:trojan-activity; sid:1000016; rev:25;)
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"NIICross-site scripting attempt"; flow:to_server,established; pcre:"/((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/i"; classtype:web-application-attack;sid:1000023; rev:32;)
